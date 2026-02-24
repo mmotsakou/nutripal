@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}NutriPal – Create Your Plan{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Build Your Personalized Nutrition Plan</h1>
+  <p>
+    Fill in the form below. NutriPal will calculate your daily targets, generate
+    a 7-day meal plan, build your grocery list, and give you evidence-based guidance
+    — all in seconds.
+  </p>
+</section>
+
+{% if error %}
+<div class="alert alert-error">
+  <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<form action="{{ url_for('generate') }}" method="POST" class="plan-form" novalidate>
+
+  <!-- ── Personal Profile ───────────────────────────────────────────── -->
+  <fieldset>
+    <legend>Personal Profile</legend>
+    <div class="form-grid">
+
+      <div class="field">
+        <label for="age">Age <span class="req">*</span></label>
+        <input type="number" id="age" name="age" min="16" max="100"
+               placeholder="e.g. 32" required />
+      </div>
+
+      <div class="field">
+        <label for="sex">Biological sex <span class="req">*</span></label>
+        <select id="sex" name="sex" required>
+          <option value="">— select —</option>
+          <option value="m">Male</option>
+          <option value="f">Female</option>
+          <option value="other">Other / prefer not to say</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="height_cm">Height (cm) <span class="req">*</span></label>
+        <input type="number" id="height_cm" name="height_cm" min="100" max="250"
+               placeholder="e.g. 170" required />
+      </div>
+
+      <div class="field">
+        <label for="weight_kg">Current weight (kg) <span class="req">*</span></label>
+        <input type="number" id="weight_kg" name="weight_kg" min="30" max="350"
+               step="0.1" placeholder="e.g. 75.5" required />
+      </div>
+
+      <div class="field field--wide">
+        <label for="goal_weight">Goal / body composition goal</label>
+        <input type="text" id="goal_weight" name="goal_weight"
+               placeholder="e.g. 68 kg, or 'tone and maintain muscle'" />
+      </div>
+
+      <div class="field field--wide">
+        <label for="activity_level">Activity level <span class="req">*</span></label>
+        <select id="activity_level" name="activity_level" required>
+          <option value="">— select —</option>
+          <option value="sedentary">Sedentary (desk job, little/no exercise)</option>
+          <option value="lightly_active">Lightly active (1-3 days/week)</option>
+          <option value="moderately_active">Moderately active (3-5 days/week)</option>
+          <option value="very_active">Very active (6-7 days/week or physical job)</option>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Health Context ─────────────────────────────────────────────── -->
+  <fieldset>
+    <legend>Health Context</legend>
+    <div class="form-grid">
+
+      <div class="field field--wide">
+        <label for="medical_conditions">Medical conditions</label>
+        <input type="text" id="medical_conditions" name="medical_conditions"
+               placeholder="e.g. diabetes, hypertension, PCOS  (or leave blank)" />
+        <span class="hint">Separate multiple conditions with commas.</span>
+      </div>
+
+      <div class="field field--wide">
+        <label for="allergies">Food allergies or intolerances</label>
+        <input type="text" id="allergies" name="allergies"
+               placeholder="e.g. gluten, dairy, nuts  (or leave blank)" />
+        <span class="hint">Separate with commas. Affected meals will be excluded.</span>
+      </div>
+
+      <div class="field field--wide">
+        <label for="medications">Medications that affect diet</label>
+        <input type="text" id="medications" name="medications"
+               placeholder="e.g. metformin, statins  (or leave blank)" />
+      </div>
+
+      <div class="field field--wide">
+        <label for="bloodwork">Bloodwork concerns (if known)</label>
+        <input type="text" id="bloodwork" name="bloodwork"
+               placeholder="e.g. high LDL, low iron  (or leave blank)" />
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Lifestyle & Preferences ───────────────────────────────────── -->
+  <fieldset>
+    <legend>Lifestyle &amp; Preferences</legend>
+    <div class="form-grid">
+
+      <div class="field field--wide">
+        <label for="diet_style">Diet style <span class="req">*</span></label>
+        <select id="diet_style" name="diet_style" required>
+          <option value="">— select —</option>
+          <option value="omnivore">Omnivore (eats everything)</option>
+          <option value="mediterranean">Mediterranean</option>
+          <option value="vegetarian">Vegetarian (no meat/fish)</option>
+          <option value="vegan">Vegan (no animal products)</option>
+          <option value="keto">Ketogenic / low-carb</option>
+        </select>
+      </div>
+
+      <div class="field field--wide">
+        <label for="dislikes">Foods I dislike or won't eat</label>
+        <input type="text" id="dislikes" name="dislikes"
+               placeholder="e.g. mushrooms, salmon  (or leave blank)" />
+        <span class="hint">Meals containing these items will be excluded.</span>
+      </div>
+
+      <div class="field">
+        <label for="cooking_skill">Cooking skill level <span class="req">*</span></label>
+        <select id="cooking_skill" name="cooking_skill" required>
+          <option value="">— select —</option>
+          <option value="beginner">Beginner (30 min max, simple recipes)</option>
+          <option value="intermediate">Intermediate (comfortable in kitchen)</option>
+          <option value="advanced">Advanced (enjoy complex cooking)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="budget">Weekly grocery budget <span class="req">*</span></label>
+        <select id="budget" name="budget" required>
+          <option value="">— select —</option>
+          <option value="tight">Tight (maximize value)</option>
+          <option value="moderate">Moderate</option>
+          <option value="flexible">Flexible (quality first)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="meals_per_day">Meals per day <span class="req">*</span></label>
+        <select id="meals_per_day" name="meals_per_day" required>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="include_snacks">Include snacks?</label>
+        <select id="include_snacks" name="include_snacks">
+          <option value="yes" selected>Yes — include 2 snacks/day</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Goals ─────────────────────────────────────────────────────── -->
+  <fieldset>
+    <legend>Your Goals</legend>
+    <div class="form-grid">
+
+      <div class="field field--wide">
+        <label for="primary_goal">Primary goal <span class="req">*</span></label>
+        <select id="primary_goal" name="primary_goal" required>
+          <option value="">— select —</option>
+          <option value="fat_loss">Fat loss</option>
+          <option value="muscle_gain">Muscle gain</option>
+          <option value="better_energy">Better energy &amp; performance</option>
+          <option value="manage_blood_sugar">Manage blood sugar</option>
+          <option value="general_health">General health &amp; maintenance</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="timeframe">Timeframe</label>
+        <input type="text" id="timeframe" name="timeframe"
+               placeholder="e.g. 3 months" />
+      </div>
+
+      <div class="field field--wide">
+        <label for="secondary_goals">Secondary goals</label>
+        <input type="text" id="secondary_goals" name="secondary_goals"
+               placeholder="e.g. improve gut health, reduce inflammation" />
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-large">
+      Generate My Plan →
+    </button>
+    <p class="disclaimer">
+      * Required fields. NutriPal is for informational purposes only.
+    </p>
+  </div>
+
+</form>
+{% endblock %}

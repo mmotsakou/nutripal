@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}NutriPal{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="logo">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">NutriPal</span>
+      </a>
+      <p class="tagline">Your personalized dietary plan, built by science.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        NutriPal provides general nutrition guidance only and is not a substitute
+        for professional medical or dietitian advice. Consult a qualified healthcare
+        provider before making significant dietary changes, especially if you have a
+        medical condition or take medication.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

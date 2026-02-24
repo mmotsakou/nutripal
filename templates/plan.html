@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}NutriPal – Your Personalized Plan{% endblock %}
+
+{% block content %}
+{% set t = plan.targets %}
+{% set f = plan.form %}
+
+<!-- ── Summary banner ──────────────────────────────────────────────── -->
+<section class="plan-header">
+  <div class="plan-header__inner">
+    <h1>Your Personalized Nutrition Plan</h1>
+    <p class="plan-meta">
+      {{ f.age }} y/o ·
+      {{ f.weight_kg }} kg · {{ f.height_cm }} cm ·
+      {{ f.activity_level | replace('_', ' ') | title }} ·
+      {{ f.primary_goal | replace('_', ' ') | title }}
+    </p>
+    <a href="{{ url_for('index') }}" class="btn btn-outline">← Edit Profile</a>
+  </div>
+</section>
+
+<!-- ── 1. Daily Targets ─────────────────────────────────────────────── -->
+<section class="card" id="targets">
+  <h2>1. Daily Calorie &amp; Macro Targets</h2>
+  <div class="macro-grid">
+    <div class="macro-card macro-card--calories">
+      <span class="macro-value">{{ t.daily_calories }}</span>
+      <span class="macro-label">Calories (kcal)</span>
+    </div>
+    <div class="macro-card macro-card--protein">
+      <span class="macro-value">{{ t.protein_g }}g</span>
+      <span class="macro-label">Protein</span>
+    </div>
+    <div class="macro-card macro-card--carbs">
+      <span class="macro-value">{{ t.carbs_g }}g</span>
+      <span class="macro-label">Carbohydrates</span>
+    </div>
+    <div class="macro-card macro-card--fat">
+      <span class="macro-value">{{ t.fat_g }}g</span>
+      <span class="macro-label">Fat</span>
+    </div>
+    <div class="macro-card macro-card--fiber">
+      <span class="macro-value">{{ t.fiber_g }}g</span>
+      <span class="macro-label">Fiber (min)</span>
+    </div>
+  </div>
+  <div class="bmr-note">
+    <strong>BMR:</strong> {{ t.bmr }} kcal/day &nbsp;|&nbsp;
+    <strong>TDEE:</strong> {{ t.tdee }} kcal/day &nbsp;|&nbsp;
+    <strong>Target:</strong> {{ t.daily_calories }} kcal/day
+    ({{ "%+d" | format(t.daily_calories - t.tdee) }} vs. maintenance)
+  </div>
+</section>
+
+<!-- ── 2. 7-Day Meal Plan ───────────────────────────────────────────── -->
+<section class="card" id="meal-plan">
+  <h2>2. 7-Day Meal Plan</h2>
+
+  {% for day in plan.meal_plan %}
+  <details class="day-block" {% if loop.index == 1 %}open{% endif %}>
+    <summary class="day-summary">
+      <span class="day-name">{{ day.day }}</span>
+      <span class="day-totals">
+        {{ day.totals.cal }} kcal &middot;
+        P {{ day.totals.protein }}g &middot;
+        C {{ day.totals.carbs }}g &middot;
+        F {{ day.totals.fat }}g
+      </span>
+    </summary>
+
+    <div class="meals-grid">
+      {% for slot, meal in day.meals.items() %}
+      <div class="meal-card">
+        <div class="meal-card__header">
+          <span class="meal-slot">{{ slot | replace('_', ' ') | title }}</span>
+          <span class="meal-time">~{{ meal.prep_min }} min prep</span>
+        </div>
+        <h4 class="meal-name">{{ meal.name }}</h4>
+        <ul class="ingredient-list">
+          {% for ing in meal.ingredients %}
+          <li>{{ ing }}</li>
+          {% endfor %}
+        </ul>
+        <div class="meal-macros">
+          <span>{{ meal.cal }} kcal</span>
+          <span>P {{ meal.protein }}g</span>
+          <span>C {{ meal.carbs }}g</span>
+          <span>F {{ meal.fat }}g</span>
+          <span>Fiber {{ meal.fiber }}g</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </details>
+  {% endfor %}
+</section>
+
+<!-- ── 3. Grocery List ──────────────────────────────────────────────── -->
+<section class="card" id="grocery">
+  <h2>3. Grocery List</h2>
+  <p class="section-note">
+    Items are de-duplicated across all 7 days. Adjust quantities based on your
+    household size and how much you plan to batch-cook.
+  </p>
+  <div class="grocery-grid">
+    {% for category, items in plan.grocery_list.items() %}
+    <div class="grocery-category">
+      <h3>{{ category }}</h3>
+      <ul>
+        {% for item in items | sort %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ── 4. Meal Prep Tips ────────────────────────────────────────────── -->
+<section class="card" id="meal-prep">
+  <h2>4. Meal Prep Tips</h2>
+  <ul class="tip-list">
+    {% for tip in plan.meal_prep_tips %}
+    <li>{{ tip }}</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<!-- ── 5. What to Avoid ─────────────────────────────────────────────── -->
+<section class="card" id="avoid">
+  <h2>5. What to Avoid &amp; Why</h2>
+  <div class="avoid-grid">
+    {% for item in plan.foods_to_avoid %}
+    <div class="avoid-card">
+      <div class="avoid-food">❌ {{ item.food }}</div>
+      <div class="avoid-reason">{{ item.reason }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ── 6. If Progress Stalls ───────────────────────────────────────── -->
+<section class="card" id="plateau">
+  <h2>6. How to Adjust If Progress Stalls</h2>
+  <ol class="plateau-list">
+    {% for strategy in plan.plateau_strategies %}
+    <li>{{ strategy }}</li>
+    {% endfor %}
+  </ol>
+</section>
+
+<!-- ── Disclaimer ───────────────────────────────────────────────────── -->
+<section class="disclaimer-box">
+  <h3>Important Disclaimer</h3>
+  <p>
+    This plan is generated algorithmically for <strong>informational purposes only</strong>
+    and does not constitute medical or dietitian advice. Calorie and macro targets are
+    estimates based on population-level equations (Mifflin-St Jeor) and may not reflect
+    your individual metabolism.
+  </p>
+  <p>
+    Please consult a registered dietitian (RD) or your physician before making significant
+    dietary changes — especially if you have a chronic medical condition, are pregnant or
+    breastfeeding, or take prescription medications.
+  </p>
+</section>
+
+<div class="form-actions" style="margin-top: 2rem;">
+  <a href="{{ url_for('index') }}" class="btn btn-primary">← Create a New Plan</a>
+</div>
+{% endblock %}
