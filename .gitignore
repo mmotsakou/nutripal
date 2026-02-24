@@ -1,10 +1,52 @@
+# Python (legacy)
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.env
 *.egg-info/
-dist/
-build/
 .venv/
 venv/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo / React Native
+.expo/
+dist/
+build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# macOS
+.DS_Store
+*.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Compiled output
+*.tgz
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
