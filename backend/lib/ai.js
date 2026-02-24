@@ -6,11 +6,15 @@ const fetch = require('node-fetch');
 
 const provider = process.env.AI_PROVIDER || 'openai';
 
-// ── OpenAI ───────────────────────────────────────────────────────────────────
-let openaiClient = null;
-if (provider === 'openai') {
-  const OpenAI = require('openai');
-  openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// ── OpenAI — lazy init so missing key doesn't crash on module load ─────────────
+let _openaiClient = null;
+function getOpenAI() {
+  if (!_openaiClient) {
+    const OpenAI = require('openai');
+    if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY is not set in .env');
+    _openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openaiClient;
 }
 
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
@@ -22,7 +26,7 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3';
  */
 async function complete(messages, opts = {}) {
   if (provider === 'openai') {
-    const resp = await openaiClient.chat.completions.create({
+    const resp = await getOpenAI().chat.completions.create({
       model: OPENAI_MODEL,
       messages,
       temperature: opts.temperature ?? 0.7,
@@ -54,7 +58,7 @@ async function complete(messages, opts = {}) {
  */
 async function stream(messages, onChunk, onDone, opts = {}) {
   if (provider === 'openai') {
-    const streamResp = await openaiClient.chat.completions.create({
+    const streamResp = await getOpenAI().chat.completions.create({
       model: OPENAI_MODEL,
       messages,
       temperature: opts.temperature ?? 0.7,

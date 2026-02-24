@@ -4,10 +4,8 @@
     "slug": "nutricoach",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#0f172a"
     },
@@ -22,30 +20,17 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f172a"
       },
       "package": "com.personal.nutricoach",
       "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
         "expo-camera",
         { "cameraPermission": "Allow NutriCoach to access your camera to scan barcodes." }
       ],
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#22c55e"
-        }
-      ]
-    ],
-    "extra": {
-      "eas": { "projectId": "your-eas-project-id" }
-    }
+      "expo-notifications"
+    ]
   }
 }
